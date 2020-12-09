@@ -2,6 +2,8 @@ package com.hurricane.kata.adventofcode2020.day9
 
 import com.hurricane.kata.adventofcode2020.Puzzle
 import com.hurricane.kata.adventofcode2020.PuzzleIntTestSupport
+import groovy.transform.builder.Builder
+import groovy.transform.builder.SimpleStrategy
 import spock.lang.Unroll
 
 @Unroll
@@ -26,6 +28,71 @@ class Day9Test extends PuzzleIntTestSupport {
                 expectedAnswer: 62
         )
     }
+
+    def "should return current number in port output"() {
+        given:
+            def portOutput = definePortOutput {
+                withNumbers(numbers)
+                withPreambleSize(preambleSize)
+            }
+
+        expect:
+            takeCurrentNumber(portOutput) == expectedNumber
+
+        where:
+            numbers               | preambleSize || expectedNumber
+            [1, 2, 3]             | 2            || 3
+            [1, 2, 3, 4, 5]       | 3            || 4
+            [21, 3, 10, 12, 5, 7] | 5            || 7
+    }
+
+    def "should take next number from port output"() {
+        given:
+            def portOutput = definePortOutput {
+                withNumbers([21, 3, 10, 12, 5, 7])
+                withPreambleSize(3)
+            }
+
+        expect:
+            takeCurrentNumber(portOutput) == 12
+            takeNextNumber(portOutput) == 5
+            takeNextNumber(portOutput) == 7
+    }
+
+    def "should determine if (initial) current number is valid"() {
+        given:
+            def portOutput = definePortOutput {
+                withNumbers([21, 3, 10, 13, 5, 7])
+                withPreambleSize(3)
+            }
+
+        expect:
+            isCurrentNumberValid(portOutput)
+        and:
+            takeCurrentNumber(portOutput) == 13
+    }
+
+    def "should determine validity of all numbers from port output"() {
+        given:
+            def portOutput = definePortOutput {
+                withNumbers([21, 3, 10, 13, 5, 7, 20])
+                withPreambleSize(3)
+            }
+
+        expect:
+            isCurrentNumberValid(portOutput)
+            takeCurrentNumber(portOutput) == 13
+        and:
+            !isNextNumberValid(portOutput)
+            takeCurrentNumber(portOutput) == 5
+        and:
+            !isNextNumberValid(portOutput)
+            takeCurrentNumber(portOutput) == 7
+        and:
+            isNextNumberValid(portOutput)
+            takeCurrentNumber(portOutput) == 20
+    }
+
 
     def "should determine if number is valid within window"() {
         given:
@@ -122,21 +189,58 @@ class Day9Test extends PuzzleIntTestSupport {
         window = window.removeFirstAndAdd(newNumber)
     }
 
-    private Long findInvalidNumberIn(List<Long> numbers, int windowSize) {
+    private static Long findInvalidNumberIn(List<Long> numbers, int windowSize) {
         def finder = new InvalidNumberFinder(windowSize)
 
         finder.find(numbers)
     }
 
-    private List<Long> findEncryptionWeaknessNumbers(List<Long> numbers, long invalidNumber) {
+    private static List<Long> findEncryptionWeaknessNumbers(List<Long> numbers, long invalidNumber) {
         def finder = new EncryptionWeaknessSequenceFinder(numbers)
 
         finder.find(invalidNumber)
     }
 
-    private Long findAndCalculateEncryptionWeakness(List<Long> numbers, long invalidNumber) {
+    private static Long findAndCalculateEncryptionWeakness(List<Long> numbers, long invalidNumber) {
         def calculator = new EncryptionWeaknessCalculator(numbers)
 
         calculator.findAndCalculate(invalidNumber)
+    }
+
+    private static PortOutput definePortOutput(@DelegatesTo(PortOutputBuilder) Closure builderDef) {
+        def builder = new PortOutputBuilder()
+        builder.with(builderDef)
+
+        return builder.build()
+    }
+
+    private static Long takeCurrentNumber(PortOutput portOutput) {
+        portOutput.currentNumber
+    }
+
+    private static Long takeNextNumber(PortOutput portOutput) {
+        portOutput.shift()
+
+        return portOutput.currentNumber
+    }
+
+    private static boolean isCurrentNumberValid(PortOutput portOutput) {
+        portOutput.isCurrentValid()
+    }
+
+    private static boolean isNextNumberValid(PortOutput portOutput) {
+        portOutput.shift()
+
+        return portOutput.isCurrentValid()
+    }
+}
+
+@Builder(builderStrategy = SimpleStrategy, prefix = 'with')
+class PortOutputBuilder {
+    List<Integer> numbers
+    Integer preambleSize
+
+    PortOutput build() {
+        new PortOutput(numbers.collect { it.toLong() }, preambleSize)
     }
 }
