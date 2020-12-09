@@ -5,19 +5,11 @@ class InvalidNumberFinder(private val windowSize: Int) {
     fun find(numbers: List<Long>): Long? {
         var window = createPreambleWindow(numbers)
 
-        for (invalidNumberCandidate in numbersWithoutPreamble(numbers)) {
-            if (window.isNumberValid(invalidNumberCandidate)) {
-                window = window.removeFirstAndAdd(invalidNumberCandidate)
-            } else {
-                return invalidNumberCandidate
-            }
-        }
-
         return numbersWithoutPreamble(numbers)
-                .find { numberToCheck ->
-                    val isValid = window.isNumberValid(numberToCheck)
+                .find { invalidNumberCandidate ->
+                    val isValid = window.isNumberValid(invalidNumberCandidate)
                     if (isValid) {
-                        window = window.removeFirstAndAdd(numberToCheck)
+                        window = window.removeFirstAndAdd(invalidNumberCandidate)
                     }
 
                     !isValid

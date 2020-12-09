@@ -6,14 +6,12 @@ import com.hurricane.kata.adventofcode2020.shared.PuzzleSolution
 
 class Day9Part1Runner(windowSize: Int = 25) : PuzzleSolution {
 
-    private val finder = InvalidNumberFinder(windowSize)
+    private val invalidNumberFinder = InvalidNumberFinder(windowSize)
 
     override fun solve(puzzleInput: PuzzleInput): PuzzleAnswer {
-        val invalidNumber = finder.find(toNumbers(puzzleInput))
+        val invalidNumber = invalidNumberFinder.find(puzzleInput.toLongNumbers())
+
         return PuzzleAnswer(invalidNumber)
     }
-
-    private fun toNumbers(puzzleInput: PuzzleInput): List<Long> =
-            puzzleInput.entries.map { it.toLong() }
 
 }

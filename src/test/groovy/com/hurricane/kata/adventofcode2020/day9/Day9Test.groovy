@@ -129,7 +129,7 @@ class Day9Test extends PuzzleIntTestSupport {
     }
 
     private List<Long> findEncryptionWeaknessNumbers(List<Long> numbers, long invalidNumber) {
-        def finder = new EncryptionWeaknessFinder(numbers)
+        def finder = new EncryptionWeaknessSequenceFinder(numbers)
 
         finder.find(invalidNumber)
     }
@@ -137,6 +137,6 @@ class Day9Test extends PuzzleIntTestSupport {
     private Long findAndCalculateEncryptionWeakness(List<Long> numbers, long invalidNumber) {
         def calculator = new EncryptionWeaknessCalculator(numbers)
 
-        calculator.calculate(invalidNumber)
+        calculator.findAndCalculate(invalidNumber)
     }
 }

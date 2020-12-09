@@ -49,7 +49,15 @@ data class PuzzleDescription(
 
 data class PuzzleInput(
         val entries: List<String>
-)
+) {
+
+    fun toIntNumbers(): List<Int> =
+            entries.map { it.toInt() }
+
+    fun toLongNumbers(): List<Long> =
+            entries.map { it.toLong() }
+
+}
 
 data class PuzzleAnswer(
         val solution: Any?

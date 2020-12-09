@@ -8,7 +8,7 @@ import com.hurricane.kata.adventofcode2020.shared.PuzzleSolution
 class Day1Part1Runner : PuzzleSolution {
 
     override fun solve(puzzleInput: PuzzleInput): PuzzleAnswer {
-        val entries = puzzleInput.entries.map { it.toInt() }
+        val entries = puzzleInput.toIntNumbers()
 
         val solution = TwoNumberSolutionFinder().find(entries)
 
