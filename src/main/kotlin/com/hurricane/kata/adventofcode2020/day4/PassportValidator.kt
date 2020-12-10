@@ -78,7 +78,7 @@ class PassportFieldValidator {
         else -> false
     }
 
-    private fun matchesHgtPattern(value: String) = value.matches(Regex("[0-9]+(cm|in)"))
+    private fun matchesHgtPattern(value: String) = value.matches("[0-9]+(cm|in)".toRegex())
 
     private fun validateHcl(value: String) =
             value.matches(Regex("#[0-9a-f]{6}"))

@@ -12,7 +12,7 @@ class Day10Test extends PuzzleIntTestSupport {
         new Puzzle(
                 inputLocation: 'test_entries_day10.txt',
                 solution: new Day10Part1Runner(),
-                expectedAnswer: 5
+                expectedAnswer: 220
         )
     }
 
@@ -21,7 +21,7 @@ class Day10Test extends PuzzleIntTestSupport {
         new Puzzle(
                 inputLocation: 'test_entries_day10.txt',
                 solution: new Day10Part2Runner(),
-                expectedAnswer: 8
+                expectedAnswer: 19208
         )
     }
 
