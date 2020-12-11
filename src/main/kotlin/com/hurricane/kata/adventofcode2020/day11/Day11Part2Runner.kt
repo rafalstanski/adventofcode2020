@@ -7,14 +7,15 @@ import com.hurricane.kata.adventofcode2020.shared.PuzzleSolution
 class Day11Part2Runner : PuzzleSolution {
 
     private val seatGridParser = SeatGridParser()
+    private val seatGridChanger = SeatGridChanger(SeatChanger())
 
     override fun solve(puzzleInput: PuzzleInput): PuzzleAnswer {
         var seatGrid = seatGridParser.parse(puzzleInput.entries)
-        var occupiedCount: Int
 
+        var occupiedCount: Int
         do {
             occupiedCount = seatGrid.countOccupied()
-            seatGrid = seatGrid.changeSits()
+            seatGrid = seatGridChanger.change(seatGrid)
         } while (occupiedCount != seatGrid.countOccupied())
 
         return PuzzleAnswer(occupiedCount)
