@@ -1,15 +1,16 @@
 package com.hurricane.kata.adventofcode2020.day11
 
-class SeatGridChanger(private val seatChanger: SeatChanger) {
+class SeatGridChanger(
+        private val seatChanger: SeatChanger,
+        private val counterFactory: OccupiedNeighboursCounterFactory) {
 
     fun change(seatGrid: SeatGrid): SeatGrid {
-        val neighboursCounter = OccupiedNeighboursCounter(seatGrid)
+        val neighboursCounter = counterFactory.create(seatGrid)
 
-        return seatGrid.copyAndTransform { row, col, seat ->
-            val occupiedNeighboursCount = neighboursCounter.count(row, col)
-
-            seatChanger.change(seat, occupiedNeighboursCount)
-        }
+        return seatGrid.copyAndTransform(changeSeatUsing(neighboursCounter))
     }
+
+    private fun changeSeatUsing(neighboursCounter: OccupiedNeighboursCounter): (Int, Int, Seat) -> Seat =
+            { row, col, seat -> seatChanger.change(seat, neighboursCounter.count(row, col)) }
 
 }

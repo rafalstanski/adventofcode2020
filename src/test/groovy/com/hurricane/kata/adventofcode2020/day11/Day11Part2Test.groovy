@@ -8,7 +8,7 @@ import static com.hurricane.kata.adventofcode2020.day11.Seat.FLOOR
 import static com.hurricane.kata.adventofcode2020.day11.Seat.OCCUPIED
 
 @Unroll
-class Day11Part1Test extends Specification {
+class Day11Part2Test extends Specification {
 
     def "empty seat should becomes occupied when there are no occupied neighbours"() {
         when:
@@ -37,7 +37,7 @@ class Day11Part1Test extends Specification {
             seatAfterChange == EMPTY
 
         where:
-            occupiedNeighbours << (4..8)
+            occupiedNeighbours << (5..8)
     }
 
     def "occupied seat should not becomes empty when less then four neighbours are also occupied"() {
@@ -48,7 +48,7 @@ class Day11Part1Test extends Specification {
             seatAfterChange != EMPTY
 
         where:
-            occupiedNeighbours << (1..3)
+            occupiedNeighbours << (1..4)
     }
 
     def "floor should should not change no mather of occupied neighbours count"() {
@@ -65,9 +65,10 @@ class Day11Part1Test extends Specification {
     def "should count occupied neighbours based on adjacent seats"() {
         given:
             def seatGrid = parseLayout([
-                    'L.L',
-                    'L.L',
-                    '#.#',
+                    '....',
+                    '....',
+                    '#.#.',
+                    '....',
             ])
 
         expect:
@@ -75,11 +76,18 @@ class Day11Part1Test extends Specification {
 
         where:
             row | col | expectedCount
-            0   | 0   | 0
+            0   | 0   | 2
+            0   | 1   | 0
+            0   | 2   | 2
+            0   | 3   | 0
             1   | 0   | 1
             1   | 1   | 2
-            2   | 0   | 0
+            2   | 0   | 1
             2   | 1   | 2
+            3   | 0   | 1
+            3   | 1   | 2
+            3   | 2   | 1
+
     }
 
     def "should change all seat"() {
@@ -95,14 +103,14 @@ class Day11Part1Test extends Specification {
 
         then:
             expectedLayout(seatGridAfter, [
-                    '#.L#',
+                    'L.L#',
                     'L.LL',
-                    '#.##',
+                    '#.L#',
             ])
     }
 
     private static Seat changeSeat(Seat seat, int occupiedNeighbours) {
-        def changer = new Part1SeatChanger()
+        def changer = new Part2SeatChanger()
 
         changer.change(seat, occupiedNeighbours)
     }
@@ -114,13 +122,13 @@ class Day11Part1Test extends Specification {
     }
 
     private static int countOccupiedNeighbours(SeatGrid seatGrid, int row, int col) {
-        def counter = new AdjacentOccupiedNeighboursCounter(seatGrid)
+        def counter = new VisibleOccupiedNeighboursCounter(seatGrid)
 
         counter.count(row, col)
     }
 
     private static SeatGrid runSeatChanges(SeatGrid seatGrid) {
-        def changer = new SeatGridChanger(new Part1SeatChanger(), new AdjacentOccupiedNeighboursCounterFactory())
+        def changer = new SeatGridChanger(new Part1SeatChanger(), new VisibleOccupiedNeighboursCounterFactory())
 
         return changer.change(seatGrid)
     }
