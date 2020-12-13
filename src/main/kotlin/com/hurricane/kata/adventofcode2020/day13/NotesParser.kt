@@ -14,9 +14,10 @@ class NotesParser {
     private fun extractBuses(notesInput: List<String>) =
             notesInput[1]
                     .split(',')
-                    .filter { isOutOfService(it) }
-                    .map { Bus(it.toInt(), 0) }
+                    .mapIndexed { index, busId -> index to busId }
+                    .filter { isOutOfService(it.second) }
+                    .map { Bus(it.second.toInt(), it.first) }
 
-    private fun isOutOfService(bus: String) =
-            bus != "x"
+    private fun isOutOfService(busId: String) =
+            busId != "x"
 }

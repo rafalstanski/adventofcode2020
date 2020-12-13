@@ -44,10 +44,10 @@ class Day13Test extends PuzzleIntTestSupport {
 
     def "should select earliest bus"() {
         given:
-            def buses = [5, 7, 11]
+            def busesIds = [5, 7, 11]
 
         expect:
-            selectEarliestBus(arrivalTime, buses) == expectedEarliestBusId
+            selectEarliestBus(arrivalTime, busesIds) == expectedEarliestBusId
 
         where:
             arrivalTime || expectedEarliestBusId
@@ -98,7 +98,19 @@ class Day13Test extends PuzzleIntTestSupport {
             notesInput                     || expectedBuses
             ['1', 'x,x,x,1,x,x,x']         || [bus(1, 3)]
             ['10', '1,x,2,x,3']            || [bus(1, 0), bus(2, 2), bus(3, 4)]
-            ['939', '3,x,x,7,19,x,x,22,x'] || [bus(3, 0), bus(7, 1), bus(19, 0), bus(22, 0)]
+            ['939', '3,x,x,7,19,x,x,22,x'] || [bus(3, 0), bus(7, 3), bus(19, 4), bus(22, 7)]
+    }
+
+    def "should find magic number"() {
+        expect:
+            findMagicNumber(buses) == expectedMagicNumber
+
+        where:
+            buses             || expectedMagicNumber
+            '17,x,13,19'      || 3417L
+            '67,7,59,61'      || 754018L
+            '67,x,7,59,61'    || 779210L
+            '1789,37,47,1889' || 1202161486L
     }
 
     private static DepartTime calculateEarliestDepartTime(int arrivalTime, int busId) {
@@ -108,7 +120,7 @@ class Day13Test extends PuzzleIntTestSupport {
     }
 
     private static int selectEarliestBus(int arrivalTime, List<Integer> busesIds) {
-        def buses = busesIds.collect{bus(it, 0)}
+        def buses = busesIds.collect { bus(it, 0) }
         def finder = new EarliestDepartTimeFinder(buses)
 
         return finder.find(arrivalTime).bus.busId
@@ -122,5 +134,13 @@ class Day13Test extends PuzzleIntTestSupport {
 
     private static Bus bus(int busId, int offset) {
         return new Bus(busId, offset)
+    }
+
+    private static long findMagicNumber(String buses) {
+        def finder = new MagicNumberFinder()
+
+        def notes = parseNotes(['1', buses])
+
+        return finder.find(notes.buses)
     }
 }
