@@ -14,7 +14,7 @@ class Day13Part1Runner : PuzzleSolution {
         val finder = EarliestDepartTimeFinder(notes.buses)
         val departTime = finder.find(notes.arrivalTime)
 
-        return PuzzleAnswer(departTime.bus * departTime.waitTime)
+        return PuzzleAnswer(departTime.bus.busId * departTime.waitTime)
     }
 
 }

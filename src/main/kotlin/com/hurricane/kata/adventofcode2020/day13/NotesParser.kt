@@ -15,7 +15,7 @@ class NotesParser {
             notesInput[1]
                     .split(',')
                     .filter { isOutOfService(it) }
-                    .map { it.toInt() }
+                    .map { Bus(it.toInt(), 0) }
 
     private fun isOutOfService(bus: String) =
             bus != "x"
