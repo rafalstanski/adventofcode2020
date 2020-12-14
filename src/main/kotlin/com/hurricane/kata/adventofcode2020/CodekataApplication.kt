@@ -6,10 +6,10 @@ import com.hurricane.kata.adventofcode2020.day10.Day10Part1Runner
 import com.hurricane.kata.adventofcode2020.day10.Day10Part2Runner
 import com.hurricane.kata.adventofcode2020.day11.Day11Part1Runner
 import com.hurricane.kata.adventofcode2020.day11.Day11Part2Runner
-import com.hurricane.kata.adventofcode2020.day13.Day13Part1Runner
-import com.hurricane.kata.adventofcode2020.day13.Day13Part2Runner
 import com.hurricane.kata.adventofcode2020.day12.Day12Part1Runner
 import com.hurricane.kata.adventofcode2020.day12.Day12Part2Runner
+import com.hurricane.kata.adventofcode2020.day13.Day13Part1Runner
+import com.hurricane.kata.adventofcode2020.day13.Day13Part2Runner
 import com.hurricane.kata.adventofcode2020.day2.Day2Part1Runner
 import com.hurricane.kata.adventofcode2020.day2.Day2Part2Runner
 import com.hurricane.kata.adventofcode2020.day3.Day3Part1Runner
