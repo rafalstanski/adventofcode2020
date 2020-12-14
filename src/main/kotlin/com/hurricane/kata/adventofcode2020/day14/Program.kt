@@ -3,7 +3,7 @@ package com.hurricane.kata.adventofcode2020.day14
 class Program(commandsInputs: List<String>) {
 
     private val commands = CommandsParser().parse(commandsInputs)
-    private val memory = mutableMapOf<Int, Long>()
+    private val memory = mutableMapOf<Long, Long>()
     private var modifier = ValueMaskModifier.noModifications()
 
     fun run(): ProgramResult {
@@ -26,11 +26,11 @@ class Program(commandsInputs: List<String>) {
     }
 }
 
-class ProgramResult(private val memory: Map<Int, Long>) {
+class ProgramResult(private val memory: Map<Long, Long>) {
 
     val memorySum = memory.values.sum()
 
-    fun readMemoryAt(address: Int): Long? {
+    fun readMemoryAt(address: Long): Long? {
         return memory[address]
     }
 

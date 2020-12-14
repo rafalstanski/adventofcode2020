@@ -4,4 +4,4 @@ sealed class Command
 
 class MaskCommand(val value: String) : Command()
 
-class StoreCommand(val memoryAddress: Int, val value: Long) : Command()
+class StoreCommand(val memoryAddress: Long, val value: Long) : Command()

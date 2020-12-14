@@ -25,7 +25,7 @@ class CommandsParser {
         val maskRegex = "mem\\[([0-9]+)\\] = ([0-9]+)".toRegex()
         val matchMask = maskRegex.matchEntire(commandInput)
 
-        val memoryAddress = matchMask.valueAt(1).toInt()
+        val memoryAddress = matchMask.valueAt(1).toLong()
         val value = matchMask.valueAt(2).toLong()
 
         return StoreCommand(memoryAddress, value)

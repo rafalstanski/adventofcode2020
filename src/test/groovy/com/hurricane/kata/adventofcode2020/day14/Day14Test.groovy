@@ -15,7 +15,7 @@ class Day14Test extends PuzzleIntTestSupport {
     @Override
     protected Puzzle puzzlePart1() {
         new Puzzle(
-                inputLocation: 'test_entries_day14.txt',
+                inputLocation: 'test_entries_day14part1.txt',
                 solution: new Day14Part1Runner(),
                 expectedAnswer: 165
         )
@@ -24,7 +24,7 @@ class Day14Test extends PuzzleIntTestSupport {
     @Override
     protected Puzzle puzzlePart2() {
         new Puzzle(
-                inputLocation: 'test_entries_day14.txt',
+                inputLocation: 'test_entries_day14part2.txt',
                 solution: new Day14Part2Runner(),
                 expectedAnswer: 208
         )
@@ -233,6 +233,61 @@ class Day14Test extends PuzzleIntTestSupport {
                     .hasSum(125)
     }
 
+    def "all 0 bits mask should not change memory address"() {
+        given:
+            def mask = maskWithAll('0')
+
+        expect:
+            modifyAddressUsingMask(address, mask) == [address].toSet()
+
+        where:
+            address << [1, 100, 5000]
+    }
+
+    def "all 1 bits mask should set all memory address bits"() {
+        given:
+            def mask = maskWithAll('1')
+
+        expect:
+            modifyAddressUsingMask(address, mask) == [MAX_VALUE].toSet()
+
+        where:
+            address << [1, 100, 5000]
+    }
+
+    def "X bits in mask should generate multiple memory addresses"() {
+        given:
+            def mask = withLeading0(maskRightSide)
+
+        expect:
+            modifyAddressUsingMask(address, mask) == expectedAddresses.toSet()
+
+        where:
+            maskRightSide | address || expectedAddresses
+            'X'           | 0        | [0L, 1L]
+            'X'           | 1        | [0L, 1L]
+            'X0X'         | 0        | [0L, 1L, 4L, 5L]
+            'X0X'         | 2        | [2L, 3L, 6L, 7L]
+            'X1X'         | 0        | [2L, 3L, 6L, 7L]
+    }
+
+    def "should use mask to modify values and generate addresses before storing them in memory"() {
+        given:
+            def commandsInput = [
+                    'mask = 00000000000000000000000000000010000X',
+                    'mem[0] = 48',
+                    'mask = 000000000000000000000000000000000X10',
+                    'mem[1] = 7']
+
+        when:
+            def programResult = runProgramWithDecodedAddress(commandsInput)
+
+        then:
+            assertThatResult(programResult)
+                    .hasInMemory(0: 32, 1: 32, 6: 6, 7: 6)
+                    .hasSum(76)
+    }
+
     private static String maskWithAll(String bit) {
         return (1..36).collect { bit }.join('')
     }
@@ -254,11 +309,20 @@ class Day14Test extends PuzzleIntTestSupport {
         return allX.join('')
     }
 
+    private static String withLeading0(String maskRightSide) {
+        return maskRightSide.padLeft(36, '0')
+    }
 
     private static long modifyValueUsingMask(long value, String mask) {
         def modifier = new ValueMaskModifier(mask)
 
         return modifier.modify(value)
+    }
+
+    private static Set<Long> modifyAddressUsingMask(long address, String mask) {
+        def decoder = new MemoryAddressDecoder(mask)
+
+        return decoder.decode(address)
     }
 
     private static List<Command> parseCommands(List<String> commandsInput) {
@@ -273,6 +337,11 @@ class Day14Test extends PuzzleIntTestSupport {
         return program.run()
     }
 
+    private static ProgramResult runProgramWithDecodedAddress(List<String> commandsInput) {
+        def program = new Program(commandsInput)
+
+        return program.run()
+    }
 }
 
 
@@ -299,7 +368,7 @@ class CommandAssertions {
         return this
     }
 
-    CommandAssertions hasMemoryAddress(int expectedMemoryAddress) {
+    CommandAssertions hasMemoryAddress(long expectedMemoryAddress) {
         assert (command as StoreCommand).memoryAddress == expectedMemoryAddress
         return this
     }
@@ -326,7 +395,7 @@ class ProgramResultAssertions {
         return this
     }
 
-    ProgramResultAssertions hasSum(int expectedSum) {
+    ProgramResultAssertions hasSum(long expectedSum) {
         assert programResult.memorySum == expectedSum
         return this
     }
