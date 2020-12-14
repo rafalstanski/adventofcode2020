@@ -30,7 +30,7 @@ class Day14Test extends PuzzleIntTestSupport {
         )
     }
 
-    def "mask with only X should leave unchanged"() {
+    def "mask with only X should leave value unchanged"() {
         given:
             def mask = maskWithAll('X')
 
@@ -58,7 +58,7 @@ class Day14Test extends PuzzleIntTestSupport {
             value << [0, 5, 10_000, MAX_VALUE]
     }
 
-    def "mask with only 1 should set up all bits"() {
+    def "mask with only 1 should set up all value's bits"() {
         given:
             def mask = maskWithAll('1')
 
@@ -72,7 +72,7 @@ class Day14Test extends PuzzleIntTestSupport {
             value << [0, 5, 10_000, MAX_VALUE]
     }
 
-    def "bit-mask should set specified bits"() {
+    def "bit-mask should set specified value 's bits"() {
         when:
             def valueAfter = modifyValueUsingMask(value, mask)
 
@@ -87,7 +87,7 @@ class Day14Test extends PuzzleIntTestSupport {
             0b101000 | maskWith1At(5, 2, 1)  || 59
     }
 
-    def "bit-mask should reset specified bits"() {
+    def "bit-mask should reset specified value's bits"() {
         when:
             def valueAfter = modifyValueUsingMask(value, mask)
 
@@ -215,7 +215,7 @@ class Day14Test extends PuzzleIntTestSupport {
             ['mem[10] = 7', 'mem[100] = 9', 'mem[10000] = 11'] | 27
     }
 
-    def "should use mask when storing in memory"() {
+    def "should use mask to modify values before storing them in memory"() {
         given:
             def commandsInput = [
                     'mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX0',
