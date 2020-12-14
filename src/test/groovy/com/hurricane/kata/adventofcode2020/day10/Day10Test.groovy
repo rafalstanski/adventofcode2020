@@ -25,9 +25,4 @@ class Day10Test extends PuzzleIntTestSupport {
         )
     }
 
-    def "should"() {
-        expect:
-            false
-    }
-
 }
