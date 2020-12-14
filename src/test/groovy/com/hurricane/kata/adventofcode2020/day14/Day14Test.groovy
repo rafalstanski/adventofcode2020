@@ -34,11 +34,8 @@ class Day14Test extends PuzzleIntTestSupport {
         given:
             def mask = maskWithAll('X')
 
-        when:
-            def afterValue = modifyValueUsingMask(value, mask)
-
-        then:
-            afterValue == value
+        expect:
+            modifyValueUsingMask(value, mask) == value
 
         where:
             value << [0, 5, 10_000, MAX_VALUE]
@@ -48,11 +45,8 @@ class Day14Test extends PuzzleIntTestSupport {
         given:
             def mask = maskWithAll('0')
 
-        when:
-            def afterValue = modifyValueUsingMask(value, mask)
-
-        then:
-            afterValue == 0
+        expect:
+            modifyValueUsingMask(value, mask) == 0
 
         where:
             value << [0, 5, 10_000, MAX_VALUE]
@@ -62,22 +56,16 @@ class Day14Test extends PuzzleIntTestSupport {
         given:
             def mask = maskWithAll('1')
 
-        when:
-            def afterValue = modifyValueUsingMask(value, mask)
-
-        then:
-            afterValue == MAX_VALUE
+        expect:
+            modifyValueUsingMask(value, mask) == MAX_VALUE
 
         where:
             value << [0, 5, 10_000, MAX_VALUE]
     }
 
     def "bit-mask should set specified value 's bits"() {
-        when:
-            def valueAfter = modifyValueUsingMask(value, mask)
-
-        then:
-            valueAfter == expectedValueAfter
+        expect:
+            modifyValueUsingMask(value, mask) == expectedValueAfter
 
         where:
             value    | mask                  || expectedValueAfter
@@ -88,11 +76,8 @@ class Day14Test extends PuzzleIntTestSupport {
     }
 
     def "bit-mask should reset specified value's bits"() {
-        when:
-            def valueAfter = modifyValueUsingMask(value, mask)
-
-        then:
-            valueAfter == expectedValueAfter
+        expect:
+            modifyValueUsingMask(value, mask) == expectedValueAfter
 
         where:
             value  | mask                    || expectedValueAfter
@@ -284,8 +269,8 @@ class Day14Test extends PuzzleIntTestSupport {
 
         then:
             assertThatResult(programResult)
-                    .hasInMemory(0: 32, 1: 32, 6: 6, 7: 6)
-                    .hasSum(76)
+                    .hasInMemory(32: 48, 33: 48, 3: 7, 7: 7)
+                    .hasSum(110)
     }
 
     private static String maskWithAll(String bit) {
@@ -332,13 +317,19 @@ class Day14Test extends PuzzleIntTestSupport {
     }
 
     private static ProgramResult runProgram(List<String> commandsInput) {
-        def program = new Program(commandsInput)
+        def program = new Program(
+                { new ValueMaskModifier(it) },
+                { MemoryAddressDecoder.noFloating() },
+                commandsInput)
 
         return program.run()
     }
 
     private static ProgramResult runProgramWithDecodedAddress(List<String> commandsInput) {
-        def program = new Program(commandsInput)
+        def program = new Program(
+                { ValueMaskModifier.noModifications() },
+                { new MemoryAddressDecoder(it) },
+                commandsInput)
 
         return program.run()
     }

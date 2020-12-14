@@ -7,7 +7,14 @@ import com.hurricane.kata.adventofcode2020.shared.PuzzleSolution
 class Day14Part2Runner : PuzzleSolution {
 
     override fun solve(puzzleInput: PuzzleInput): PuzzleAnswer {
-        return PuzzleAnswer(null)
+        val program = Program(
+                valueMaskModifier = { ValueMaskModifier.noModifications() },
+                memoryAddressDecoder = { MemoryAddressDecoder(it) },
+                commandsInputs = puzzleInput.entries)
+
+        val programResult = program.run()
+
+        return PuzzleAnswer(programResult.memorySum)
     }
 
 }

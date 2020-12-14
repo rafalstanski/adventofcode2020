@@ -2,41 +2,37 @@ package com.hurricane.kata.adventofcode2020.day14
 
 import kotlin.math.pow
 
-class ValueMaskModifier(private val mask: String) {
+class ValueMaskModifier(mask: String) {
 
-    fun modify(value: Long): Long {
-        val afterSettingValue = modifyUsingSettingBits(value)
-        val afterResettingValue = modifyUsingResettingBits(afterSettingValue)
+    private val orMask = calculateMaskValueFiltering(mask) {it == '1'}
 
-        return afterResettingValue
-    }
+    private val andMask = calculateMaskValueFiltering(mask) {it != '0'}
 
-    private fun modifyUsingSettingBits(value: Long): Long {
-        val orMask = mask
+    private fun calculateMaskValueFiltering(mask: String, predicate: (Char) -> Boolean): Long {
+        return mask
                 .reversed()
                 .mapIndexed { index, bitChar -> index to bitChar }
-                .filter { it.second == '1' }
+                .filter { predicate(it.second) }
                 .map { 2.0.pow(it.first) }
                 .sum().toLong()
-
-        return value.or(orMask)
     }
 
-    private fun modifyUsingResettingBits(value: Long): Long {
-        val andMask = mask
-                .reversed()
-                .mapIndexed { index, bitChar -> index to bitChar }
-                .filter { it.second != '0' }
-                .map { 2.0.pow(it.first) }
-                .sum().toLong()
+    fun modify(value: Long): Long =
+            value
+                    .let { modifyUsingSettingBits(it) }
+                    .let { modifyUsingResettingBits(it) }
 
-        return value.and(andMask)
-    }
+    private fun modifyUsingSettingBits(value: Long): Long =
+            value.or(orMask)
+
+    private fun modifyUsingResettingBits(value: Long): Long =
+            value.and(andMask)
 
     companion object {
 
+        @JvmStatic
         fun noModifications(): ValueMaskModifier {
-            return ValueMaskModifier("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+            return ValueMaskModifier("X".repeat(36))
         }
     }
 

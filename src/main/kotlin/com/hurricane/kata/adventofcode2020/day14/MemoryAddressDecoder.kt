@@ -14,34 +14,41 @@ class MemoryAddressDecoder(mask: String) {
             .filter { it.second == 'X' }
             .map { it.first }
 
-    private fun asSingleBitsWithPosition(mask: String): List<Pair<Int, Char>> {
-        return mask
-                .reversed()
-                .mapIndexed { index, bitChar -> index to bitChar }
-    }
+    private fun asSingleBitsWithPosition(mask: String): List<Pair<Int, Char>> =
+            mask
+                    .reversed()
+                    .mapIndexed { index, bitChar -> index to bitChar }
 
-    fun decode(address: Long): Set<Long> {
-        val afterSettingValue = modifyUsingSettingBits(address)
-
-        return generatePossibleValues(afterSettingValue)
-    }
+    fun decode(address: Long): Set<Long> =
+            address
+                    .let { modifyUsingSettingBits(it) }
+                    .let { generatePossibleValues(it) }
 
     private fun modifyUsingSettingBits(value: Long): Long =
             value.or(orMask)
 
     private fun generatePossibleValues(value: Long): Set<Long> {
-        val base = value.toString(2).padStart(36, '0').reversed().toList()
-
         val allCombinations = mutableListOf<List<Char>>()
 
-        generateAllCombinations(allCombinations, base, 0)
+        generateAllCombinations(allCombinations, valueToBits(value), 0)
 
         return allCombinations
-                .map { perm -> perm.joinToString("").reversed().toLong(2) }
+                .map { perm -> bitsToValue(perm) }
                 .toSet()
     }
 
-    private fun generateAllCombinations(acc:MutableList<List<Char>>, bits: List<Char>, indexToChange: Int) {
+    private fun valueToBits(value: Long) = value
+            .toString(2)
+            .padStart(36, '0')
+            .reversed()
+            .toList()
+
+    private fun bitsToValue(perm: List<Char>) = perm
+            .joinToString("")
+            .reversed()
+            .toLong(2)
+
+    private fun generateAllCombinations(acc: MutableList<List<Char>>, bits: List<Char>, indexToChange: Int) {
         if (indexToChange < xSlotsIndexes.size) {
             val with0 = bits.toMutableList()
             with0[xSlotsIndexes[indexToChange]] = '0'
@@ -53,6 +60,12 @@ class MemoryAddressDecoder(mask: String) {
         } else {
             acc += bits
         }
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun noFloating() = MemoryAddressDecoder("")
     }
 
 }
