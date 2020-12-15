@@ -1,22 +1,26 @@
 package com.hurricane.kata.adventofcode2020.day15
 
-class Solver(private val turns: Int) {
+class MemoryGame(private val turns: Int) {
 
-    fun solve(input: String): Int {
-        val extractedInput = input.asNumbers()
+    fun play(input: String): Int {
+        val extractedNumbers = input.asNumbers()
 
+        return playUsing(extractedNumbers)
+    }
+
+    private fun playUsing(gameNumbers: List<Int>): Int {
         val previousSpoken = mutableMapOf<Int, Int>()
-        val recentlySpoken = speakFirstNumbers(extractedInput)
+        val recentlySpoken = speakFirstNumbers(gameNumbers)
 
-        var recentNumber = extractedInput.last()
+        var recentNumber = gameNumbers.last()
 
-        (extractedInput.size + 1..turns).forEach { turn ->
+        (firstTurnAfterSpeaking(gameNumbers)..turns).forEach { turn ->
             recentNumber = when {
                 previousSpoken.containsKey(recentNumber) -> recentlySpoken[recentNumber]!! - previousSpoken[recentNumber]!!
                 else -> 0
             }
 
-            recentlySpoken[recentNumber]?.let {previousSpoken[recentNumber] = it }
+            recentlySpoken[recentNumber]?.let { previousSpoken[recentNumber] = it }
             recentlySpoken[recentNumber] = turn
         }
 
@@ -33,4 +37,7 @@ class Solver(private val turns: Int) {
                     .mapIndexed { index, number -> number to index + 1 }
                     .toMap()
                     .toMutableMap()
+
+    private fun firstTurnAfterSpeaking(gameNumbers: List<Int>) =
+            gameNumbers.size + 1
 }
