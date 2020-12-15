@@ -7,24 +7,31 @@ class Solver(private val turns: Int) {
 
         val previousSpoken = mutableMapOf<Int,Int>()
         val recentlySpoken = speakFirstNumbers(extractedInput)
-        var mostRecentlySpokenNumber = extractedInput.last()
+        var recentNumber = extractedInput.last()
 
         (extractedInput.size + 1..turns).forEach { turn ->
-            if (previousSpoken.containsKey(mostRecentlySpokenNumber)) {
-                mostRecentlySpokenNumber = recentlySpoken[mostRecentlySpokenNumber]!! - previousSpoken[mostRecentlySpokenNumber]!!
-            } else {
-                mostRecentlySpokenNumber = 0
+            recentNumber = when {
+                previousSpoken.containsKey(recentNumber) -> recentlySpoken[recentNumber]!! - previousSpoken[recentNumber]!!
+                else -> 0
             }
 
-            if (recentlySpoken.containsKey(mostRecentlySpokenNumber)) {
-                previousSpoken[mostRecentlySpokenNumber] = recentlySpoken[mostRecentlySpokenNumber]!!
-                recentlySpoken[mostRecentlySpokenNumber] = turn
-            } else {
-                recentlySpoken[mostRecentlySpokenNumber] = turn
+            recentNumber.let {
+                if (recentlySpoken.containsKey(it)) {
+                    previousSpoken[it] = recentlySpoken[it]!!
+                    recentlySpoken[it] = turn
+                } else {
+                    recentlySpoken[it] = turn
+                }
             }
         }
 
-        return mostRecentlySpokenNumber
+        return recentNumber
+    }
+
+    private fun extractNumbers(input: String): List<Int> {
+        return input
+                .split(',')
+                .map { it.toInt() }
     }
 
     private fun speakFirstNumbers(extractedInput: List<Int>): MutableMap<Int, Int> {
@@ -32,11 +39,5 @@ class Solver(private val turns: Int) {
                 .mapIndexed { index, number -> number to index + 1 }
                 .toMap()
                 .toMutableMap()
-    }
-
-    private fun extractNumbers(input: String): List<Int> {
-        return input
-                .split(',')
-                .map { it.toInt() }
     }
 }
