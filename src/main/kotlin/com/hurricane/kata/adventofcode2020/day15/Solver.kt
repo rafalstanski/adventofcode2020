@@ -3,10 +3,11 @@ package com.hurricane.kata.adventofcode2020.day15
 class Solver(private val turns: Int) {
 
     fun solve(input: String): Int {
-        val extractedInput = extractNumbers(input)
+        val extractedInput = input.asNumbers()
 
-        val previousSpoken = mutableMapOf<Int,Int>()
+        val previousSpoken = mutableMapOf<Int, Int>()
         val recentlySpoken = speakFirstNumbers(extractedInput)
+
         var recentNumber = extractedInput.last()
 
         (extractedInput.size + 1..turns).forEach { turn ->
@@ -15,29 +16,21 @@ class Solver(private val turns: Int) {
                 else -> 0
             }
 
-            recentNumber.let {
-                if (recentlySpoken.containsKey(it)) {
-                    previousSpoken[it] = recentlySpoken[it]!!
-                    recentlySpoken[it] = turn
-                } else {
-                    recentlySpoken[it] = turn
-                }
-            }
+            recentlySpoken[recentNumber]?.let {previousSpoken[recentNumber] = it }
+            recentlySpoken[recentNumber] = turn
         }
 
         return recentNumber
     }
 
-    private fun extractNumbers(input: String): List<Int> {
-        return input
-                .split(',')
-                .map { it.toInt() }
-    }
+    private fun String.asNumbers(): List<Int> =
+            this
+                    .split(',')
+                    .map { it.toInt() }
 
-    private fun speakFirstNumbers(extractedInput: List<Int>): MutableMap<Int, Int> {
-        return extractedInput
-                .mapIndexed { index, number -> number to index + 1 }
-                .toMap()
-                .toMutableMap()
-    }
+    private fun speakFirstNumbers(extractedInput: List<Int>): MutableMap<Int, Int> =
+            extractedInput
+                    .mapIndexed { index, number -> number to index + 1 }
+                    .toMap()
+                    .toMutableMap()
 }
