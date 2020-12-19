@@ -1,5 +1,7 @@
 package com.hurricane.kata.adventofcode2020.day18
 
+import java.util.*
+
 class EquationCalculator {
 
     fun calculate(equation: String): Long {
@@ -8,18 +10,32 @@ class EquationCalculator {
         return calculateUsing(notProcessedEquation)
     }
 
-    private fun calculateUsing(notProcessedEquation: StringBuilder): Long {
-        var result = takeNumber(notProcessedEquation)
+    private fun calculateUsing(notProcessedEquation: StringBuilder): Long =
+            FlatEquationCalculator().calculate(notProcessedEquation)
+
+    private fun createTokenizer(equation: String): StringBuilder {
+        return StringBuilder(removeSpaces(equation))
+    }
+
+    private fun removeSpaces(equation: String) = equation.replace(" ", "")
+
+}
+
+private class FlatEquationCalculator {
+
+    private val stack = Stack<Token>()
+
+    fun calculate(notProcessedEquation: StringBuilder): Long {
+        pushNumber(notProcessedEquation)
 
         while (notProcessedEquation.isNotEmpty() && noClosingParentheses(notProcessedEquation)) {
-            val operation = extractOperation(notProcessedEquation)
+            pushOperation(notProcessedEquation)
+            pushNumber(notProcessedEquation)
 
-            val number2 = takeNumber(notProcessedEquation)
-
-            result = performOperation(result, operation, number2)
+            calculateStackAndPushValue()
         }
 
-        return result
+        return popAsNumber().value
     }
 
     private fun noClosingParentheses(notProcessedEquation: StringBuilder): Boolean =
@@ -30,30 +46,58 @@ class EquationCalculator {
                 true
             }
 
-    private fun createTokenizer(equation: String): StringBuilder {
-        return StringBuilder(removeSpaces(equation))
+    private fun pushNumber(notProcessedEquation: StringBuilder) {
+        if (notProcessedEquation.startsWith('(')) {
+            notProcessedEquation.delete(0, 1)
+
+            val innerValue = FlatEquationCalculator().calculate(notProcessedEquation)
+
+            stack.push(NumberToken(innerValue))
+        } else {
+            val number = "[0-9]+".toRegex().find(notProcessedEquation)!!.groupValues[0]
+            notProcessedEquation.delete(0, number.length)
+
+            stack.push(NumberToken(number.toLong()))
+        }
     }
 
-    private fun removeSpaces(equation: String) = equation.replace(" ", "")
-
-    private fun takeNumber(notProcessedEquation: StringBuilder): Long =
-            if (notProcessedEquation.startsWith('(')) {
-                notProcessedEquation.delete(0, 1)
-
-                calculateUsing(notProcessedEquation)
-            } else {
-                val number = "[0-9]+".toRegex().find(notProcessedEquation)!!.groupValues[0]
-                notProcessedEquation.delete(0, number.length)
-
-                number.toLong()
-            }
-
-    private fun extractOperation(notProcessedEquation: StringBuilder): String {
+    private fun pushOperation(notProcessedEquation: StringBuilder) {
         val operation = "\\+|\\*".toRegex().find(notProcessedEquation)!!.value
         notProcessedEquation.delete(0, operation.length)
 
-        return operation
+        stack.push(OperationToken(operation))
     }
+
+    private fun calculateStackAndPushValue() {
+        val value = calculateStack()
+
+        stack.push(NumberToken(value))
+    }
+
+    private fun calculateStack(): Long {
+        var right = popAsNumber().value
+
+        while (stack.isNotEmpty()) {
+            val operation = popAsOperation().symbol
+            val left = popAsNumber().value
+
+            right = performOperation(left, operation, right)
+        }
+
+        return right
+    }
+
+    private fun popAsNumber(): NumberToken =
+            when (val token = stack.pop()) {
+                is NumberToken -> token
+                else -> throw IllegalStateException("expected number rather then $token")
+            }
+
+    private fun popAsOperation(): OperationToken =
+            when (val token = stack.pop()) {
+                is OperationToken -> token
+                else -> throw IllegalStateException("expected operation rather then $token")
+            }
 
     private fun performOperation(left: Long, operation: String, right: Long): Long {
         return when (operation.trim()) {
@@ -64,3 +108,9 @@ class EquationCalculator {
     }
 
 }
+
+sealed class Token
+
+class NumberToken(val value: Long) : Token()
+
+class OperationToken(val symbol: String) : Token()

@@ -21,7 +21,7 @@ class Day18Test extends PuzzleIntTestSupport {
         new Puzzle(
                 inputLocation: 'test_entries_day18.txt',
                 solution: new Day18Part2Runner(),
-                expectedAnswer: 208
+                expectedAnswer: 23340
         )
     }
 
