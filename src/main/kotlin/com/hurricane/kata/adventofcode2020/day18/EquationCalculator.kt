@@ -2,7 +2,7 @@ package com.hurricane.kata.adventofcode2020.day18
 
 import java.util.*
 
-class EquationCalculator {
+class EquationCalculator(private val priorityCalculator: OperationPriorityCalculator) {
 
     fun calculate(equation: String): Long {
         val notProcessedEquation = createTokenizer(equation)
@@ -11,7 +11,7 @@ class EquationCalculator {
     }
 
     private fun calculateUsing(notProcessedEquation: StringBuilder): Long =
-            FlatEquationCalculator().calculate(notProcessedEquation)
+            FlatEquationCalculator(priorityCalculator).calculate(notProcessedEquation)
 
     private fun createTokenizer(equation: String): StringBuilder {
         return StringBuilder(removeSpaces(equation))
@@ -21,22 +21,31 @@ class EquationCalculator {
 
 }
 
-private class FlatEquationCalculator {
+private class FlatEquationCalculator(private val priorityCalculator: OperationPriorityCalculator) {
 
     private val stack = Stack<Token>()
 
     fun calculate(notProcessedEquation: StringBuilder): Long {
-        pushNumber(notProcessedEquation)
+        extractAndPushNumber(notProcessedEquation)
+
+        var previousOperationPriority = Int.MIN_VALUE
 
         while (notProcessedEquation.isNotEmpty() && noClosingParentheses(notProcessedEquation)) {
-            pushOperation(notProcessedEquation)
-            pushNumber(notProcessedEquation)
+            val operation = extractOperation(notProcessedEquation)
+            if (previousOperationPriority > priorityOf(operation)) {
+                calculateStackAndPushValue()
+            }
+            pushToken(operation)
+            previousOperationPriority = priorityOf(operation)
 
-            calculateStackAndPushValue()
+            extractAndPushNumber(notProcessedEquation)
         }
 
-        return popAsNumber().value
+        return calculateStackAndPushValue().value
     }
+
+    private fun priorityOf(operation: OperationToken): Int =
+            priorityCalculator.calculate(operation)
 
     private fun noClosingParentheses(notProcessedEquation: StringBuilder): Boolean =
             if (notProcessedEquation.startsWith(')')) {
@@ -46,33 +55,39 @@ private class FlatEquationCalculator {
                 true
             }
 
-    private fun pushNumber(notProcessedEquation: StringBuilder) {
+    private fun extractAndPushNumber(notProcessedEquation: StringBuilder) {
         if (notProcessedEquation.startsWith('(')) {
             notProcessedEquation.delete(0, 1)
 
-            val innerValue = FlatEquationCalculator().calculate(notProcessedEquation)
+            val innerValue = calculateInnerValue(notProcessedEquation)
 
-            stack.push(NumberToken(innerValue))
+            pushToken(NumberToken(innerValue))
         } else {
             val number = "[0-9]+".toRegex().find(notProcessedEquation)!!.groupValues[0]
             notProcessedEquation.delete(0, number.length)
 
-            stack.push(NumberToken(number.toLong()))
+            pushToken(NumberToken(number.toLong()))
         }
     }
 
-    private fun pushOperation(notProcessedEquation: StringBuilder) {
+    private fun calculateInnerValue(notProcessedEquation: StringBuilder) =
+            FlatEquationCalculator(priorityCalculator).calculate(notProcessedEquation)
+
+    private fun extractOperation(notProcessedEquation: StringBuilder): OperationToken {
         val operation = "\\+|\\*".toRegex().find(notProcessedEquation)!!.value
         notProcessedEquation.delete(0, operation.length)
 
-        stack.push(OperationToken(operation))
+        return OperationToken(operation)
     }
 
-    private fun calculateStackAndPushValue() {
+    private fun calculateStackAndPushValue() : NumberToken {
         val value = calculateStack()
 
-        stack.push(NumberToken(value))
+        return pushToken(NumberToken(value))
     }
+
+    private fun <T : Token> pushToken(token: T): T =
+            stack.push(token) as T
 
     private fun calculateStack(): Long {
         var right = popAsNumber().value

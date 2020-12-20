@@ -70,9 +70,33 @@ class Day18Test extends PuzzleIntTestSupport {
             '(2 * 3) + (5 * 2)' || 16
     }
 
+    def "should be able to mix operations add and multiply with the differencing priorities"() {
+        expect:
+            calculateWithPriorities(equation) == expectedResult
+
+        where:
+            equation                                          || expectedResult
+            '2 * 3 + 4'                                       || 14
+            '2 + 3 * 2 + 4'                                   || 30
+            '2 * 10 + 3 * 5'                                  || 130
+            '1 + (2 * 3) + (4 * (5 + 6))'                     || 51
+            '2 * 3 + (4 * 5)'                                 || 46
+            '5 + (8 * 3 + 9 + 3 * 4 * 3)'                     || 1445
+            '8 * 3 + 9 + 3 * 4 * 3'                           || 8 * 15 * 4 * 3
+            '5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))'       || 669060
+            '((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2' || 23340
+    }
+
     private static long calculate(String equation) {
-        def calculator = new EquationCalculator()
+        def calculator = new EquationCalculator(new SamePriorityCalculator())
 
         return calculator.calculate(equation)
     }
+
+    private static long calculateWithPriorities(String equation) {
+        def calculator = new EquationCalculator(new DifferentPrioritiesCalculator())
+
+        return calculator.calculate(equation)
+    }
+
 }
