@@ -20,6 +20,8 @@ import com.hurricane.kata.adventofcode2020.day18.Day18Part1Runner
 import com.hurricane.kata.adventofcode2020.day18.Day18Part2Runner
 import com.hurricane.kata.adventofcode2020.day2.Day2Part1Runner
 import com.hurricane.kata.adventofcode2020.day2.Day2Part2Runner
+import com.hurricane.kata.adventofcode2020.day21.Day21Part1Runner
+import com.hurricane.kata.adventofcode2020.day21.Day21Part2Runner
 import com.hurricane.kata.adventofcode2020.day3.Day3Part1Runner
 import com.hurricane.kata.adventofcode2020.day3.Day3Part2Runner
 import com.hurricane.kata.adventofcode2020.day4.Day4Part1Runner
@@ -73,9 +75,11 @@ fun main(args: Array<String>) {
             PuzzleDescription("day16_part1", "entries_day16.txt", Day16Part1Runner()),
             PuzzleDescription("day16_part2", "entries_day16.txt", Day16Part2Runner()),
             PuzzleDescription("day18_part1", "entries_day18.txt", Day18Part1Runner()),
-            PuzzleDescription("day18_part2", "entries_day18.txt", Day18Part2Runner())
+            PuzzleDescription("day18_part2", "entries_day18.txt", Day18Part2Runner()),
+            PuzzleDescription("day21_part1", "entries_day21.txt", Day21Part1Runner()),
+            PuzzleDescription("day21_part2", "entries_day21.txt", Day21Part2Runner())
     ))
 
-    puzzleRunner.run("day18_part1")
-    puzzleRunner.run("day18_part2")
+    puzzleRunner.run("day21_part1")
+    puzzleRunner.run("day21_part2")
 }
