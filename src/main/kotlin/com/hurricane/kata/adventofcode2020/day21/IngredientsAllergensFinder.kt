@@ -29,24 +29,31 @@ class IngredientsAllergensFinder {
                     .map { it.allergens }
                     .flatten()
 
-            ingredient.withDeducesAllergens(allergensToReduce)
+            ingredient.withReducedAllergens(allergensToReduce)
         }
     }
 
     private fun eliminateTillAllAreFound(ingredientsToPotentialAllergens: List<FoodIngredient>): List<FoodIngredient> {
-        val onlyWithMaxOneAllergen = ingredientsToPotentialAllergens.filter { it.potentialAllergensCount <= 1 }
+        var reduced = ingredientsToPotentialAllergens
+        var onlyWithMaxOneAllergen = findWithMaxOneAllergen(reduced)
 
-        if (onlyWithMaxOneAllergen.size == ingredientsToPotentialAllergens.size) return ingredientsToPotentialAllergens
+        while (onlyWithMaxOneAllergen.size < ingredientsToPotentialAllergens.size) {
+            reduced = reduced.map { current ->
+                val allergensToReduce = onlyWithMaxOneAllergen
+                        .filter { it != current }
+                        .map { it.potentialAllergens }
+                        .flatten()
 
-        val reduced = ingredientsToPotentialAllergens.map { current ->
-            val allergensToReduce = onlyWithMaxOneAllergen
-                    .filter { it != current }
-                    .map { it.potentialAllergens }
-                    .flatten()
+                current.withReducedAllergens(allergensToReduce)
+            }
 
-            current.withDeducesAllergens(allergensToReduce)
+            onlyWithMaxOneAllergen = findWithMaxOneAllergen(reduced)
         }
 
-        return eliminateTillAllAreFound(reduced)
+        return reduced
     }
+
+    private fun findWithMaxOneAllergen(reduced: List<FoodIngredient>) =
+            reduced.filter { it.potentialAllergensCount <= 1 }
+
 }

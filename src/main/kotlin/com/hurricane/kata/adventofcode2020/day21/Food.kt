@@ -14,7 +14,7 @@ data class FoodIngredient(
 ) {
     val potentialAllergensCount = potentialAllergens.size
 
-    fun withDeducesAllergens(allergensToReduce: Collection<String>): FoodIngredient =
+    fun withReducedAllergens(allergensToReduce: Collection<String>): FoodIngredient =
             this.copy(potentialAllergens = potentialAllergens - allergensToReduce)
 }
 
